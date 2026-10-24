@@ -1,0 +1,20 @@
+# Deliberately fake: replace with your New Relic ingest license key.
+license_key: "eu01xx000000000000000000000000000000000000"
+agent_dir: /var/db/newrelic-infra
+safe_bin_dir: /usr/local/share/newrelic-infra
+
+log:
+  file: /var/log/newrelic-infra/newrelic-infra.log
+
+status_server_enabled: true
+
+netflow:
+  enabled: true
+  listen: "127.0.0.1:2055"
+  sample_interval: 15
+  max_ips: 8192
+  observation_point: "router-lan"
+  # Replace these documentation ranges with your actual client subnets.
+  tracked_cidrs:
+    - "192.0.2.0/24"
+    - "2001:db8::/32"

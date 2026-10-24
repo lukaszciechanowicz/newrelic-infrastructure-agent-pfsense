@@ -34,21 +34,32 @@ pkg add ./newrelic-infra-freebsd-1.80.6_2.pkg
 
 Compare the hash with the release's `SHA256SUMS` entry before `pkg add`. The package SHA-256 is `d90bd8e4459eed0d8d8023dcda4a7a01723e0429acc83eaa955507e9890e67b1`.
 
-The package creates `/usr/local/etc/newrelic-infra.yml` only if it is absent; existing configuration is preserved. Back up an existing configuration privately before upgrading. Edit that file locally and set `license_key` to your New Relic **ingest license key**, not an `NRAK` user/API key. Never paste the key into an issue or shell command. The collector region is derived from the license key, including EU keys.
+## Configure with per-IP logging
+
+The [complete example configuration](examples/newrelic-infra.yml) enables per-IP collection and the local status server. Its license key is deliberately fake and will not send data. Replace it with your New Relic **ingest license key**, not an `NRAK` user/API key. The backend region is derived from that key, including EU.
+
+Replace the example CIDRs with your actual client subnets and choose the OS name of one internal pre-NAT interface. `YOUR_LAN_INTERFACE` below is a placeholder, not a pfSense display label. Keep the UDP listener on loopback.
+
+The package creates `/usr/local/etc/newrelic-infra.yml` only if absent. Back up existing settings privately, then merge the example into that file; do not overwrite a live configuration blindly. Never paste a real key into an issue or shell command.
 
 ```sh
 vi /usr/local/etc/newrelic-infra.yml
 chown root:wheel /usr/local/etc/newrelic-infra.yml
 chmod 600 /usr/local/etc/newrelic-infra.yml
 sysrc -f /etc/rc.conf.local newrelic_infra_enable=YES
+sysrc -f /etc/rc.conf.local newrelic_netflow_enable=YES \
+  newrelic_netflow_interface=YOUR_LAN_INTERFACE
 /usr/local/etc/rc.d/newrelic-infra.sh start
+/usr/local/etc/rc.d/newrelic-netflow-exporter.sh start
 ```
 
-For an already running installation, use `restart` after editing configuration. Look for the host in New Relic Infrastructure and inspect `/var/log/newrelic-infra/newrelic-infra.log` if it does not appear. Both services are disabled by default; enabling the agent does not enable packet capture.
+Use `restart` instead of `start` for a service that is already running after changing its configuration. Enabling the collector alone is not enough: the exporter must also be enabled and running.
+
+Generate traffic from a client across the selected interface. Check `http://localhost:8003/v1/status/errors`, exporter statistics, and `PfFlowCollectorSample`/`PfIpTrafficSample` in the account receiving your ingest key. Allow for flow expiry, the 15-second reporting window and backend ingest delay. See the guide below for exact commands and queries.
 
 ## Optional per-IP traffic
 
-See [per-IP setup, queries and troubleshooting](docs/PER_IP.md) to enable the collector and bundled exporter. Capture a single internal pre-NAT interface to retain client addresses. `tracked_cidrs` filters reported endpoints; it does not capture additional interfaces.
+Here, “IP logging” means per-IP byte and packet counters in New Relic, not packet payload or DNS query logging. See [setup, verification, queries and troubleshooting](docs/PER_IP.md). Capture a single internal pre-NAT interface to retain client addresses. `tracked_cidrs` filters reported endpoints; it does not capture additional interfaces.
 
 ## Source and contributions
 

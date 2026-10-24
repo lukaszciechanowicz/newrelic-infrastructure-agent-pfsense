@@ -6,7 +6,7 @@ In the prepared source, `internal/netflow/` decodes v9, `pkg/metrics/netflow/` a
 
 ## Configure
 
-Add or update this section in `/usr/local/etc/newrelic-infra.yml`; keep your existing license and agent settings:
+The [complete sample configuration](../examples/newrelic-infra.yml) has per-IP collection enabled, a deliberately fake ingest key and documentation CIDRs. Replace the key and CIDRs before use. Merge it into `/usr/local/etc/newrelic-infra.yml` without discarding existing settings. The relevant section is:
 
 ```yaml
 netflow:
