@@ -1,0 +1,16 @@
+New Relic Infrastructure Agent for pfSense / FreeBSD
+
+This independent distribution is based on New Relic Infrastructure Agent,
+Copyright New Relic Corporation, licensed under Apache License 2.0.
+Upstream: https://github.com/newrelic/infrastructure-agent
+Base commit: 41ff132e9f6b9220081e098c3abb98d6727cfbd8
+
+Project-maintained patches, scripts and documentation are provided under
+Apache License 2.0. The source patch identifies changes to upstream files.
+
+Release packages also include softflowd 1.1.1 and a FreeBSD capture/export
+patch. Original BSD-style and compatibility-code license notices remain
+unchanged; see THIRD_PARTY_NOTICES.md and the installed softflowd/LICENSE.
+
+New Relic, Netgate and softflowd names identify upstream projects only.
+This project is not affiliated with or endorsed by New Relic or Netgate.

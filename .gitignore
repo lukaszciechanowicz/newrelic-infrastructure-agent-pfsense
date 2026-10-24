@@ -1,0 +1,14 @@
+/work/
+/dist/
+/releases/
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+core
+core.*
+*.core
+.cache/
+.DS_Store

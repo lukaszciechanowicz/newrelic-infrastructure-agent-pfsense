@@ -1,0 +1,37 @@
+name: Source and FreeBSD build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Prepare patched source
+        run: |
+          sh -n scripts/prepare-source.sh
+          sh scripts/prepare-source.sh
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: work/source/go.mod
+          cache: false
+      - name: Cross-compile the FreeBSD agent
+        working-directory: work/source
+        env:
+          GOOS: freebsd
+          GOARCH: amd64
+          GOAMD64: v1
+          CGO_ENABLED: "0"
+          GOTOOLCHAIN: local
+        run: go build -mod=readonly -trimpath -buildvcs=false -o "$GITHUB_WORKSPACE/dist/bin/" ./cmd/...
+      - name: Test flow accounting and metric transformations
+        working-directory: work/source
+        env:
+          GOTOOLCHAIN: local
+        run: go test -mod=readonly ./internal/netflow ./pkg/metrics/netflow ./pkg/helpers/metric
